@@ -12,5 +12,5 @@ AAuroraCharacterBase::AAuroraCharacterBase()
 void AAuroraCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
+		
 }
