@@ -3,6 +3,7 @@
 
 #include "Character/AuroraCharacter.h"
 
+#include "AbilitySystemComponent.h"
 #include "AuroraComponents/CombatComponent.h"
 #include "AuroraTypes/TurningInPlace.h"
 #include "Components/CapsuleComponent.h"
@@ -14,6 +15,7 @@
 #include "MultiShooter_GAS/MultiShooter_GAS.h"
 #include "Net/UnrealNetwork.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "Player/AuroraPlayerState.h"
 #include "Sound/SoundCue.h"
 #include "Weapon/Weapon.h"
 
@@ -564,3 +566,32 @@ ECombatState AAuroraCharacter::GetCombatState() const
 	if (Combat == nullptr) return ECombatState::ECS_MAX;
 	return Combat->CombatState;
 }
+
+/** Gameplay Ability System */
+
+void AAuroraCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	// Init ability actor info for the server
+	InitAbilityActorInfo();
+}
+
+void AAuroraCharacter::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+
+	// Init ability actor info for the client
+	InitAbilityActorInfo();
+}
+
+void AAuroraCharacter::InitAbilityActorInfo()
+{
+	AAuroraPlayerState* AuroraPlayerState = GetPlayerState<AAuroraPlayerState>();
+	check(AuroraPlayerState);
+	AuroraPlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(AuroraPlayerState, this);
+	AbilitySystemComponent = AuroraPlayerState->GetAbilitySystemComponent();
+	AttributeSet = AuroraPlayerState->GetAttributeSet();
+}
+
+/** end Gameplay Ability System */

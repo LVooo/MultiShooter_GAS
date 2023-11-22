@@ -23,6 +23,12 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void PostInitializeComponents() override;
+	
+	/** GameplayAbilitySystem */
+	virtual void PossessedBy(AController* NewController) override;
+	virtual void OnRep_PlayerState() override;
+	/** end GameplayAbilitySystem */
+	
 	void PlayFireMontage(bool bAiming);
 	void PlayReloadMontage();
 	void PlayElimMontage();
@@ -160,6 +166,10 @@ private:
 	 */
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AWeapon> DefaultWeaponClass;
+
+	/** GameplayAbilitySystem */
+	void InitAbilityActorInfo();
+	/** end GameplayAbilitySystem */
 
 public:
 	// 为OverlappingWeapon赋值
