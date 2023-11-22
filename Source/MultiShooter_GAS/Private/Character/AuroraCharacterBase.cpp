@@ -9,6 +9,11 @@ AAuroraCharacterBase::AAuroraCharacterBase()
 
 }
 
+UAbilitySystemComponent* AAuroraCharacterBase::GetAbilitySystemComponent() const
+{
+	return AbilitySystemComponent;
+}
+
 void AAuroraCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
