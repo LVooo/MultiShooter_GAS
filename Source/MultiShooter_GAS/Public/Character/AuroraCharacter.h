@@ -9,6 +9,7 @@
 #include "AuroraTypes/TurningInPlace.h"
 #include "AuroraCharacter.generated.h"
 
+class AWeapon;
 /**
  * 
  */

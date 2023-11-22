@@ -76,6 +76,8 @@ AAuroraCharacter::AAuroraCharacter()
 
 	// 溶解timeline
 	DissolveTimeLine = CreateDefaultSubobject<UTimelineComponent>(TEXT("DissolveTimeLineComponent"));
+
+	PrimaryActorTick.bCanEverTick = true;
 }
 
 void AAuroraCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -213,7 +215,8 @@ void AAuroraCharacter::Destroyed()
 void AAuroraCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	SpawnDefaultWeapon();
 }
 
 void AAuroraCharacter::Tick(float DeltaTime)
