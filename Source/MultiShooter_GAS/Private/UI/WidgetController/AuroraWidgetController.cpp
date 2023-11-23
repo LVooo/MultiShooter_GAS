@@ -15,3 +15,8 @@ void UAuroraWidgetController::BroadcastInitialValues()
 {
 	
 }
+
+void UAuroraWidgetController::BindCallbacksToDependencies()
+{
+	
+}
