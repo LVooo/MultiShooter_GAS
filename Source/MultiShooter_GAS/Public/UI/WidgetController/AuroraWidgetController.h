@@ -41,6 +41,8 @@ class MULTISHOOTER_GAS_API UAuroraWidgetController : public UObject
 public:
 	UFUNCTION(BlueprintCallable)
 	void SetWidgetControllerParams(const FWidgetControllerParams& WCParams);
+	virtual void BroadcastInitialValues();
+	
 protected:
 
 	UPROPERTY(BlueprintReadOnly, Category="WidgetController")

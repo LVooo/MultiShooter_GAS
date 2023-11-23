@@ -15,8 +15,10 @@
 #include "MultiShooter_GAS/MultiShooter_GAS.h"
 #include "Net/UnrealNetwork.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "Player/AuroraPlayerController.h"
 #include "Player/AuroraPlayerState.h"
 #include "Sound/SoundCue.h"
+#include "UI/HUD/AuroraHUD.h"
 #include "Weapon/Weapon.h"
 
 AAuroraCharacter::AAuroraCharacter()
@@ -592,6 +594,14 @@ void AAuroraCharacter::InitAbilityActorInfo()
 	AuroraPlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(AuroraPlayerState, this);
 	AbilitySystemComponent = AuroraPlayerState->GetAbilitySystemComponent();
 	AttributeSet = AuroraPlayerState->GetAttributeSet();
+
+	if (AAuroraPlayerController* AuroraPlayerController = Cast<AAuroraPlayerController>(GetController()))
+	{
+		if (AAuroraHUD* AuroraHUD = Cast<AAuroraHUD>(AuroraPlayerController->GetHUD()))
+		{
+			AuroraHUD->InitOverlay(AuroraPlayerController, AuroraPlayerState, AbilitySystemComponent, AttributeSet);
+		}
+	}
 }
 
 /** end Gameplay Ability System */

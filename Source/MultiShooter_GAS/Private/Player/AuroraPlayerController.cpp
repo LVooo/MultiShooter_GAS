@@ -17,8 +17,10 @@ void AAuroraPlayerController::BeginPlay()
 	check(AuroraContext);
 
 	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
-	check(Subsystem);
-	Subsystem->AddMappingContext(AuroraContext, 0);
+	if (Subsystem)
+	{
+		Subsystem->AddMappingContext(AuroraContext, 0);	
+	}
 }
 
 void AAuroraPlayerController::SetupInputComponent()
