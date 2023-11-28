@@ -7,6 +7,7 @@
 #include "AbilitySystemInterface.h"
 #include "AuroraCharacterBase.generated.h"
 
+class UGameplayAbility;
 class UAttributeSet;
 class UAuroraAbilitySystemComponent;
 
@@ -30,4 +31,10 @@ protected:
 	TObjectPtr<UAttributeSet> AttributeSet;
 	
 	virtual void InitAbilityActorInfo();
+
+	void AddCharacterAbilities();
+
+private:
+	UPROPERTY(EditAnywhere, Category="Abilities")
+	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
 };

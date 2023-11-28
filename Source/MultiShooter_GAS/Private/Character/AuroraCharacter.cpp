@@ -578,6 +578,7 @@ void AAuroraCharacter::PossessedBy(AController* NewController)
 
 	// Init ability actor info for the server
 	InitAbilityActorInfo();
+	AddCharacterAbilities();
 }
 
 void AAuroraCharacter::OnRep_PlayerState()
