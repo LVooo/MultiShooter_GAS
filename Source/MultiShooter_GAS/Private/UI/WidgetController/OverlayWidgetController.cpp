@@ -3,6 +3,7 @@
 
 #include "UI/WidgetController/OverlayWidgetController.h"
 
+#include "AbilitySystem/AuroraAbilitySystemComponent.h"
 #include "AbilitySystem/AuroraAttributeSet.h"
 
 void UOverlayWidgetController::BroadcastInitialValues()
@@ -19,35 +20,43 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 {
 	const UAuroraAttributeSet* AuroraAttributeSet = CastChecked<UAuroraAttributeSet>(AttributeSet);
 
-	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-		AuroraAttributeSet->GetHealthAttribute()).AddUObject(this, &UOverlayWidgetController::HealthChanged);
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AuroraAttributeSet->GetHealthAttribute()).AddLambda(
+			[this](const FOnAttributeChangeData& Data)
+			{
+				OnHealthChanged.Broadcast(Data.NewValue);
+			}
+			);
+
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AuroraAttributeSet->GetMaxHealthAttribute()).AddLambda(
+			[this](const FOnAttributeChangeData& Data)
+			{
+				OnMaxHealthChanged.Broadcast(Data.NewValue);
+			}
+			);
+
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AuroraAttributeSet->GetManaAttribute()).AddLambda(
+			[this](const FOnAttributeChangeData& Data)
+			{
+				OnManaChanged.Broadcast(Data.NewValue);
+			}
+			);
 
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-		AuroraAttributeSet->GetMaxHealthAttribute()).AddUObject(this, &UOverlayWidgetController::MaxHealthChanged);
+		AuroraAttributeSet->GetMaxManaAttribute()).AddLambda(
+			[this](const FOnAttributeChangeData& Data)
+			{
+				OnMaxManaChanged.Broadcast(Data.NewValue);
+			}
+			);
 
-	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-		AuroraAttributeSet->GetManaAttribute()).AddUObject(this, &UOverlayWidgetController::ManaChanged);
-
-	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(
-		AuroraAttributeSet->GetMaxManaAttribute()).AddUObject(this, &UOverlayWidgetController::MaxManaChanged);
-}
-
-void UOverlayWidgetController::HealthChanged(const FOnAttributeChangeData& Data) const
-{
-	OnHealthChanged.Broadcast(Data.NewValue);
-}
-
-void UOverlayWidgetController::MaxHealthChanged(const FOnAttributeChangeData& Data) const
-{
-	OnMaxHealthChanged.Broadcast(Data.NewValue);
-}
-
-void UOverlayWidgetController::ManaChanged(const FOnAttributeChangeData& Data) const
-{
-	OnManaChanged.Broadcast(Data.NewValue);
-}
-
-void UOverlayWidgetController::MaxManaChanged(const FOnAttributeChangeData& Data) const
-{
-	OnMaxManaChanged.Broadcast(Data.NewValue);
+	Cast<UAuroraAbilitySystemComponent>(AbilitySystemComponent)->EffectAssetTags.AddLambda(
+		[](const FGameplayTagContainer& AssetTags)
+		{
+			for (const FGameplayTag& Tag : AssetTags)
+			{
+				const FString Msg = FString::Printf(TEXT("GE Tag: %s"), *Tag.ToString());
+				GEngine->AddOnScreenDebugMessage(-1, 8.f, FColor::Blue, Msg);
+			}
+		}
+	);
 }
