@@ -23,5 +23,11 @@ AAuroraEnemy::AAuroraEnemy()
 void AAuroraEnemy::BeginPlay()
 {
 	Super::BeginPlay();
+	InitAbilityActorInfo();
+}
+
+void AAuroraEnemy::InitAbilityActorInfo()
+{
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
+	Cast<UAuroraAbilitySystemComponent>(GetAbilitySystemComponent())->AbilityActorInfoSet();
 }

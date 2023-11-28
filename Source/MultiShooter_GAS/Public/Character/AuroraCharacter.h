@@ -168,7 +168,7 @@ private:
 	TSubclassOf<AWeapon> DefaultWeaponClass;
 
 	/** GameplayAbilitySystem */
-	void InitAbilityActorInfo();
+	virtual void InitAbilityActorInfo() override;
 	/** end GameplayAbilitySystem */
 
 public:

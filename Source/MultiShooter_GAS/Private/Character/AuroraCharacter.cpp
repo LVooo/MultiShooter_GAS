@@ -4,6 +4,7 @@
 #include "Character/AuroraCharacter.h"
 
 #include "AbilitySystemComponent.h"
+#include "AbilitySystem/AuroraAbilitySystemComponent.h"
 #include "AuroraComponents/CombatComponent.h"
 #include "AuroraTypes/TurningInPlace.h"
 #include "Components/CapsuleComponent.h"
@@ -592,6 +593,7 @@ void AAuroraCharacter::InitAbilityActorInfo()
 	AAuroraPlayerState* AuroraPlayerState = GetPlayerState<AAuroraPlayerState>();
 	check(AuroraPlayerState);
 	AuroraPlayerState->GetAbilitySystemComponent()->InitAbilityActorInfo(AuroraPlayerState, this);
+	Cast<UAuroraAbilitySystemComponent>(AuroraPlayerState->GetAbilitySystemComponent())->AbilityActorInfoSet();
 	AbilitySystemComponent = AuroraPlayerState->GetAbilitySystemComponent();
 	AttributeSet = AuroraPlayerState->GetAttributeSet();
 

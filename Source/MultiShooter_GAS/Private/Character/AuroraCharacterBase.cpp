@@ -19,3 +19,7 @@ void AAuroraCharacterBase::BeginPlay()
 	Super::BeginPlay();
 		
 }
+
+void AAuroraCharacterBase::InitAbilityActorInfo()
+{
+}
