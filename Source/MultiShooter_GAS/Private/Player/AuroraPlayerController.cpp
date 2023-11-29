@@ -4,6 +4,7 @@
 #include "Player/AuroraPlayerController.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+#include "Input/AuroraEnhancedInputComponent.h"
 
 AAuroraPlayerController::AAuroraPlayerController()
 {
@@ -27,10 +28,10 @@ void AAuroraPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
-	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent);
-
-	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AAuroraPlayerController::Move);
-	EnhancedInputComponent->BindAction(TurnAction, ETriggerEvent::Triggered, this, &AAuroraPlayerController::Turn);
+	UAuroraEnhancedInputComponent* AuroraEnhancedInputComponent = CastChecked<UAuroraEnhancedInputComponent>(InputComponent);
+	AuroraEnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AAuroraPlayerController::Move);
+	AuroraEnhancedInputComponent->BindAction(TurnAction, ETriggerEvent::Triggered, this, &AAuroraPlayerController::Turn);
+	AuroraEnhancedInputComponent->BindAbilityActions(InputConfig, this, &ThisClass::AbilityInputTagPressed, &ThisClass::AbilityInputTagReleased, &ThisClass::AbilityInputTagHeld);
 }
 
 void AAuroraPlayerController::Move(const FInputActionValue& InputActionValue)
@@ -58,4 +59,19 @@ void AAuroraPlayerController::Turn(const FInputActionValue& InputActionValue)
 		ControlledPawn->AddControllerYawInput(InputAxisVector.X);
 		ControlledPawn->AddControllerPitchInput(-InputAxisVector.Y);
 	}
+}
+
+void AAuroraPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
+{
+	GEngine->AddOnScreenDebugMessage(1, 2.f, FColor::Red, *InputTag.ToString());
+}
+
+void AAuroraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
+{
+	GEngine->AddOnScreenDebugMessage(2, 2.f, FColor::Blue, *InputTag.ToString());
+}
+
+void AAuroraPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
+{
+	GEngine->AddOnScreenDebugMessage(3, 2.f, FColor::Green, *InputTag.ToString());
 }
