@@ -2,8 +2,11 @@
 
 
 #include "Player/AuroraPlayerController.h"
+
+#include "AbilitySystemBlueprintLibrary.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+#include "AbilitySystem/AuroraAbilitySystemComponent.h"
 #include "Input/AuroraEnhancedInputComponent.h"
 
 AAuroraPlayerController::AAuroraPlayerController()
@@ -63,15 +66,26 @@ void AAuroraPlayerController::Turn(const FInputActionValue& InputActionValue)
 
 void AAuroraPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 {
-	GEngine->AddOnScreenDebugMessage(1, 2.f, FColor::Red, *InputTag.ToString());
+	// GEngine->AddOnScreenDebugMessage(1, 2.f, FColor::Red, *InputTag.ToString());
 }
 
 void AAuroraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 {
-	GEngine->AddOnScreenDebugMessage(2, 2.f, FColor::Blue, *InputTag.ToString());
+	if (GetASC() == nullptr) return;
+	GetASC()->AbilityInputTagReleased(InputTag);
 }
 
 void AAuroraPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 {
-	GEngine->AddOnScreenDebugMessage(3, 2.f, FColor::Green, *InputTag.ToString());
+	if (GetASC() == nullptr) return;
+	GetASC()->AbilityInputTagHeld(InputTag);
+}
+
+UAuroraAbilitySystemComponent* AAuroraPlayerController::GetASC()
+{
+	if (AuroraAbilitySystemComponent == nullptr)
+	{
+		AuroraAbilitySystemComponent = Cast<UAuroraAbilitySystemComponent>(UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetPawn<APawn>()));
+	}
+	return AuroraAbilitySystemComponent;
 }

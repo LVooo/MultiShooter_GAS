@@ -7,6 +7,7 @@
 #include "GameFramework/PlayerController.h"
 #include "AuroraPlayerController.generated.h"
 
+class UAuroraAbilitySystemComponent;
 class UAuroraInputConfig;
 class UInputMappingContext;
 class UInputAction;
@@ -45,4 +46,9 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category="Input")
 	TObjectPtr<UAuroraInputConfig> InputConfig;
+
+	UPROPERTY()
+	TObjectPtr<UAuroraAbilitySystemComponent> AuroraAbilitySystemComponent;
+
+	UAuroraAbilitySystemComponent* GetASC();
 };
