@@ -11,6 +11,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Engine/SkeletalMeshSocket.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "MultiShooter_GAS/MultiShooter_GAS.h"
@@ -112,6 +113,7 @@ void AAuroraCharacter::Elim()
 		&AAuroraCharacter::ElimTimerFinished,
 		ElimDelay
 	);
+
 }
 
 void AAuroraCharacter::MulticastElim_Implementation()
@@ -608,3 +610,10 @@ void AAuroraCharacter::InitAbilityActorInfo()
 }
 
 /** end Gameplay Ability System */
+
+FVector AAuroraCharacter::GetCombatSocketLocation()
+{
+	check(Combat);
+	const USkeletalMeshComponent* WeaponMesh = Combat->EquippedWeapon->GetWeaponMesh();
+	return WeaponMesh->GetSocketByName(FName("ProjectileSocket"))->GetSocketLocation(WeaponMesh);
+}

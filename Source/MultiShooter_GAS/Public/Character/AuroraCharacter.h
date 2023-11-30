@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "Interfaces/InteractWithCrosshairsInterface.h"
 #include "CoreMinimal.h"
 #include "AuroraTypes/CombatState.h"
 #include "Character/AuroraCharacterBase.h"
@@ -14,7 +15,7 @@ class AWeapon;
  * 
  */
 UCLASS()
-class MULTISHOOTER_GAS_API AAuroraCharacter : public AAuroraCharacterBase
+class MULTISHOOTER_GAS_API AAuroraCharacter : public AAuroraCharacterBase, public IInteractWithCrosshairsInterface
 {
 	GENERATED_BODY()
 
@@ -58,6 +59,8 @@ protected:
 	void DropOrDestroyWeapon(AWeapon* Weapon);
 	void DropOrDestroyWeapons();
 	void RotateInPlace(float DeltaTime);
+
+	virtual FVector GetCombatSocketLocation() override;
 
 private:
 	UPROPERTY(VisibleAnywhere, Category=Camera) // 需要在蓝图中使用
