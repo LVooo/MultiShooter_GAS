@@ -11,16 +11,25 @@ void UAuroraProjectileFire::ActivateAbility(const FGameplayAbilitySpecHandle Han
                                             const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+	
 
-	const bool bIsServer = HasAuthority(&ActivationInfo);
+}
+
+void UAuroraProjectileFire::SpawnProjectile(const FVector& ProjectileTargetLocation)
+{
+	const bool bIsServer = GetAvatarActorFromActorInfo()->HasAuthority();
 	if (!bIsServer) return;
 
 	IInteractWithCrosshairsInterface* InteractWithCrosshairsInterface = Cast<IInteractWithCrosshairsInterface>(GetAvatarActorFromActorInfo());
 	if (InteractWithCrosshairsInterface)
 	{
 		const FVector SocketLocation = InteractWithCrosshairsInterface->GetCombatSocketLocation();
+		FRotator Rotation = (ProjectileTargetLocation - SocketLocation).Rotation();
+		Rotation.Pitch = 0;
+		
 		FTransform SpawnTransform;
 		SpawnTransform.SetLocation(SocketLocation);
+		SpawnTransform.SetRotation(Rotation.Quaternion());
 
 		AProjectile* Projectile = GetWorld()->SpawnActorDeferred<AProjectile>(
 			ProjectileClass,
