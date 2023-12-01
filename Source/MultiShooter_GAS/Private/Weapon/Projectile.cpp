@@ -3,6 +3,8 @@
 
 #include "Weapon/Projectile.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystemComponent.h"
 #include "MultiShooter_GAS/MultiShooter_GAS.h"
 #include "Character/AuroraCharacter.h"
 #include "Components/BoxComponent.h"
@@ -17,20 +19,19 @@ AProjectile::AProjectile()
  
 	CollisionBox = CreateDefaultSubobject<UBoxComponent>(TEXT("CollisionBox"));
 	SetRootComponent(CollisionBox);
-	CollisionBox->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
-	CollisionBox->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	CollisionBox->SetCollisionObjectType(ECC_Projectile);
+	CollisionBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	CollisionBox->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-	CollisionBox->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
-	CollisionBox->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Block);
-	CollisionBox->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Block);
-	CollisionBox->SetCollisionResponseToChannel(ECC_SkeletalMesh, ECollisionResponse::ECR_Block);
-
-	ChoosedImpactParticle = ImpactParticles;
+	CollisionBox->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Overlap);
+	CollisionBox->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Overlap);
+	CollisionBox->SetCollisionResponseToChannel(ECC_SkeletalMesh, ECollisionResponse::ECR_Overlap);
 }
 
 void AProjectile::BeginPlay()
 {
 	Super::BeginPlay();
+	SetLifeSpan(DestroyTime);
+	CollisionBox->OnComponentBeginOverlap.AddDynamic(this, &AProjectile::OnSphereOverlap);
 
 	if (Tracer)
 	{
@@ -43,44 +44,38 @@ void AProjectile::BeginPlay()
 			EAttachLocation::KeepWorldPosition
 			);
 	}
-	
-	// 仅在服务器上实现委托回调函数
+}
+
+void AProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation());
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, GetActorTransform());
+
 	if (HasAuthority())
 	{
-		CollisionBox->OnComponentHit.AddDynamic(this, &AProjectile::OnHit);
-	}
-}
-
-void AProjectile::StartDestroyTimer()
-{
-	GetWorldTimerManager().SetTimer(
-	DestroyTimer,
-	this,
-	&AProjectile::DestroyTimeFinished,
-	DestroyTime
-	);
-}
-
-void AProjectile::DestroyTimeFinished()
-{
-	Destroy();
-}
-
-void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
-	FVector NormalImpulse, const FHitResult& Hit)
-{
-	AAuroraCharacter* AuroraCharacter = Cast<AAuroraCharacter>(OtherActor);
-	// 这种方法仅能在服务端上更改，因为OnHit在服务端调用
-	if (AuroraCharacter)
-	{
-		ChoosedImpactParticle = WeaponImpactParticles;
+		if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor))
+		{
+			TargetASC->ApplyGameplayEffectSpecToSelf(*DamageEffectSpecHandle.Data.Get());
+		}
+		Destroy();
 	}
 	else
 	{
-		ChoosedImpactParticle = ImpactParticles;
+		bHit = true;
 	}
-	Destroy(); // 这里调用的是Destroy函数而不是Destroyed()。因为AActor 的 Destroy 函数在执行完对象销毁的操作后，在其中调用了自身的 Destroyed 函数
 }
+
+void AProjectile::Destroyed()
+{
+	if (!bHit && !HasAuthority())
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation());
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, GetActorTransform());
+	}
+	Super::Destroyed();
+}
+
 
 void AProjectile::SpawnTrailSystem()
 {
@@ -99,49 +94,7 @@ void AProjectile::SpawnTrailSystem()
 	}
 }
 
-void AProjectile::ExplodeDamage()
-{
-	APawn* FiringPawn = GetInstigator();
-	if (FiringPawn && HasAuthority())
-	{
-		AController* FiringController = FiringPawn->GetController();
-		if (FiringController)
-		{
-			UGameplayStatics::ApplyRadialDamageWithFalloff(
-				this,
-				Damage,
-				10.f,
-				GetActorLocation(),
-				DamageInnerRadius,
-				DamageOuterRadius,
-				1.f,
-				UDamageType::StaticClass(),
-				TArray<AActor*>(),
-				this,
-				FiringController
-				);
-		}
-	}
-}
-
 void AProjectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
-
-void AProjectile::Destroyed()
-{
-	Super::Destroyed();
-
-	if (ChoosedImpactParticle || ImpactParticles)
-	{
-		ChoosedImpactParticle = ChoosedImpactParticle == nullptr ? ImpactParticles : ChoosedImpactParticle;
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ChoosedImpactParticle, GetActorTransform());
-	}
-	if (ImpactSound)
-	{
-		UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation());
-	}
-}
-

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayEffectTypes.h"
 #include "GameFramework/Actor.h"
 #include "Projectile.generated.h"
 
@@ -16,24 +17,21 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void Destroyed() override;
 
+	UPROPERTY(BlueprintReadWrite, meta=(ExposeOnSpawn = true))
+	FGameplayEffectSpecHandle DamageEffectSpecHandle;
+
 protected:
 	virtual void BeginPlay() override;
-	void StartDestroyTimer();
-	void DestroyTimeFinished();
 	void SpawnTrailSystem();
-	void ExplodeDamage();
-
+	
 	UFUNCTION()
-	virtual void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	void OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UPROPERTY(EditAnywhere)
 	float Damage = 20.f;
 	
 	UPROPERTY(EditAnywhere)
     class UParticleSystem* ImpactParticles;
-
-	UPROPERTY(EditAnywhere)
-	UParticleSystem* WeaponImpactParticles;
 
 	UPROPERTY(EditAnywhere)
 	class USoundCue* ImpactSound;
@@ -66,11 +64,8 @@ private:
 	UPROPERTY()
 	class UParticleSystemComponent* TracerComponent; // 发射子弹时产生的粒子效果
 
-	UPROPERTY()
-	UParticleSystem* ChoosedImpactParticle;
-
-	FTimerHandle DestroyTimer;
-
 	UPROPERTY(EditAnywhere)
 	float DestroyTime = 3.f;
+
+	bool bHit = false;
 };

@@ -4,5 +4,5 @@
 
 #include "CoreMinimal.h"
 
-// TODO: Engine Set
 #define ECC_SkeletalMesh ECollisionChannel::ECC_GameTraceChannel1
+#define ECC_Projectile ECollisionChannel::ECC_GameTraceChannel2

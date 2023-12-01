@@ -2,6 +2,9 @@
 
 
 #include "AbilitySystem/Abilities/AuroraProjectileFire.h"
+
+#include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystemComponent.h"
 #include "Weapon/Projectile.h"
 #include "Interfaces/InteractWithCrosshairsInterface.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -37,6 +40,10 @@ void UAuroraProjectileFire::SpawnProjectile(const FVector& ProjectileTargetLocat
 			GetOwningActorFromActorInfo(),
 			Cast<APawn>(GetOwningActorFromActorInfo()),
 			ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+
+		const UAbilitySystemComponent* SourceASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetAvatarActorFromActorInfo());
+		const FGameplayEffectSpecHandle SpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), SourceASC->MakeEffectContext());
+		Projectile->DamageEffectSpecHandle = SpecHandle;
 
 		Projectile->FinishSpawning(SpawnTransform);
 	}

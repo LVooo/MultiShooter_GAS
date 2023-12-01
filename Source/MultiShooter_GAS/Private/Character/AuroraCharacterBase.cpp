@@ -4,11 +4,15 @@
 #include "Character/AuroraCharacterBase.h"
 
 #include "AbilitySystem/AuroraAbilitySystemComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "MultiShooter_GAS/MultiShooter_GAS.h"
 
 AAuroraCharacterBase::AAuroraCharacterBase()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
+	GetMesh()->SetCollisionResponseToChannel(ECC_Projectile, ECR_Overlap);
+	GetMesh()->SetGenerateOverlapEvents(true);
 }
 
 UAbilitySystemComponent* AAuroraCharacterBase::GetAbilitySystemComponent() const
@@ -19,7 +23,7 @@ UAbilitySystemComponent* AAuroraCharacterBase::GetAbilitySystemComponent() const
 void AAuroraCharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
-		
+	
 }
 
 void AAuroraCharacterBase::InitAbilityActorInfo()
