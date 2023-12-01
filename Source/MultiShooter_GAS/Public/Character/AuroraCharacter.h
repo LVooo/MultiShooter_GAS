@@ -45,9 +45,6 @@ public:
 	UPROPERTY(Replicated)
 	bool bDisableGameplay = false;
 
-	UFUNCTION(BlueprintImplementableEvent)
-	void ShowSniperScopeWidget(bool bShowScope);
-
 	void SpawnDefaultWeapon();
 
 protected:
@@ -63,7 +60,7 @@ protected:
 	virtual FVector GetCombatSocketLocation() override;
 
 private:
-	UPROPERTY(VisibleAnywhere, Category=Camera) // 需要在蓝图中使用
+	UPROPERTY(VisibleAnywhere, Category=Camera)
 	class USpringArmComponent* CameraBoom;
 
 	UPROPERTY(VisibleAnywhere, Category=Camera)
