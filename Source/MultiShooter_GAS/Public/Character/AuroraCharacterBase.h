@@ -10,6 +10,7 @@
 class UGameplayAbility;
 class UAttributeSet;
 class UAuroraAbilitySystemComponent;
+class UGameplayEffect;
 
 UCLASS()
 class MULTISHOOTER_GAS_API AAuroraCharacterBase : public ACharacter, public IAbilitySystemInterface
@@ -31,6 +32,12 @@ protected:
 	TObjectPtr<UAttributeSet> AttributeSet;
 	
 	virtual void InitAbilityActorInfo();
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Attributes")
+	TSubclassOf<UGameplayEffect> DefaultPrimaryAttributes;
+
+	void ApplyEffectToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass, float Level) const;
+	virtual void InitializeDefaultAttributes() const;
 
 	void AddCharacterAbilities();
 

@@ -9,10 +9,8 @@
 
 UAuroraAttributeSet::UAuroraAttributeSet()
 {
-	InitHealth(50.f);
-	InitMaxHealth(100.f);
-	InitMana(20.f);
-	InitMaxMana(100.f);
+	InitHealth(90.f);
+	InitMana(90.f);
 }
 
 void UAuroraAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -85,6 +83,10 @@ void UAuroraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCall
 	{
 		SetMana(FMath::Clamp(GetMana(), 0, GetMaxMana()));
 	}
+	if (Data.EvaluatedData.Attribute == GetIncomingDamageAttribute())
+	{
+		HandleIncomingDamage(Props);
+	}
 }
 
 void UAuroraAttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth) const
@@ -106,5 +108,18 @@ void UAuroraAttributeSet::OnRep_Mana(const FGameplayAttributeData& OldMana) cons
 void UAuroraAttributeSet::OnRep_MaxMana(const FGameplayAttributeData& OldMaxMana) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UAuroraAttributeSet, MaxMana, OldMaxMana);
+}
+
+void UAuroraAttributeSet::HandleIncomingDamage(const FEffectProperties& Props)
+{
+	const float LocalIncomingDamage = GetIncomingDamage();
+	SetIncomingDamage(0);
+	if (LocalIncomingDamage >= 0.f)
+	{
+		const float NewHealth = GetHealth() - LocalIncomingDamage;
+		SetHealth(FMath::Clamp(NewHealth, 0.f, GetMaxHealth()));
+
+		const float bFatal = NewHealth <= 0.f;
+	}
 }
 

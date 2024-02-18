@@ -166,10 +166,10 @@ void AAuroraCharacter::MulticastElim_Implementation()
 		Combat && Combat->EquippedWeapon &&
 			Combat->EquippedWeapon->GetWeaponType() == EWeaponType::EWT_SniperRifle &&
 				Combat->bAiming;
-	if (bHideSniperScope)
+	/*if (bHideSniperScope)
 	{
 		ShowSniperScopeWidget(false);
-	}
+	}*/
 }
 
 void AAuroraCharacter::ElimTimerFinished()
@@ -580,6 +580,9 @@ void AAuroraCharacter::PossessedBy(AController* NewController)
 
 	// Init ability actor info for the server
 	InitAbilityActorInfo();
+	// 初始化AttributeSets
+	InitializeDefaultAttributes();
+	
 	AddCharacterAbilities();
 }
 
